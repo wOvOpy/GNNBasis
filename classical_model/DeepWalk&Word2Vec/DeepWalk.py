@@ -62,7 +62,6 @@ class DeepWalk(object):
         return walks
 
     def deep_walk(self, walk_length, start_node):
-
         G = self.G
 
         walk = [start_node]
