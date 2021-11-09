@@ -13,7 +13,7 @@ from sklearn.manifold import TSNE
 from joblib import Parallel, delayed
 
 
-SEED = 2020
+RANDOM_STATE = 2020
 
 
 class DeepWalk(object):
@@ -57,7 +57,7 @@ class DeepWalk(object):
 
         nodes = list(self.G.nodes())
 
-        results = Parallel(workers=workers, verbose=verbose)(
+        results = Parallel(n_jobs=workers, verbose=verbose)(
             delayed(self.simulate_walks)(nodes, num, walk_length) for num in num_walks
         )
 
@@ -149,19 +149,19 @@ def plot_embeddings(X, Y, embeddings,):
   
 def main():
     X, Y = [], []
-    with open("../wiki/Wiki_labels.txt", "r") as f:
+    with open("../data/wiki/Wiki_labels.txt", "r") as f:
         for line in f:
             x, y = line.split()
             X.append(x)
             Y.append(y)
             
-    G = nx.read_edgelist('../wiki/Wiki_edgelist.txt', create_using=nx.DiGraph(), nodetype=None, data=[('weight', int)])
-    model = DeepWalk(G, walk_length=10, num_walks=80, walkers=3, verbose=0, seed=SEED)
+    G = nx.read_edgelist('../data/wiki/Wiki_edgelist.txt', create_using=nx.DiGraph(), nodetype=None, data=[('weight', int)])
+    model = DeepWalk(G, walk_length=10, num_walks=80, walkers=3, verbose=0, seed=2020)
     model.fit(vector_size=128, window=5, workers=1, epochs=3)
     embeddings = model.get_embeddings()
 
-    clf = LogisticRegression(solver="liblinear", seed=SEED)
-    evaluate_embeddings(embeddings, clf, X, Y, test_size=0.2, random_state=SEED)
+    clf = LogisticRegression(solver="liblinear", random_state=RANDOM_STATE)
+    evaluate_embeddings(embeddings, clf, X, Y, test_size=0.2, random_state=RANDOM_STATE)
 
     plot_embeddings(X, Y, embeddings)
 

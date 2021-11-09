@@ -251,13 +251,13 @@ def plot_embeddings(X, Y, embeddings,):
         
 def main():
     X, Y = [], []
-    with open("../wiki/Wiki_labels.txt", "r") as f:
+    with open("../data/wiki/Wiki_labels.txt", "r") as f:
         for line in f:
             x, y = line.split()
             X.append(x)
             Y.append(y)
             
-    G = nx.read_edgelist('../wiki/Wiki_edgelist.txt', create_using=nx.DiGraph(), nodetype=None, data=[('weight', int)])
+    G = nx.read_edgelist('../data/wiki/Wiki_edgelist.txt', create_using=nx.DiGraph(), nodetype=None, data=[('weight', int)])
     model = Node2Vec(G, p=0.25, q=4, walk_length=10, num_walks=80, workers=3, verbose=0, seed=SEED)
     model.fit(embed_size=128, window=5, n_jobs=3, epochs=3)
     embeddings = model.get_embeddings()
