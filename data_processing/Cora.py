@@ -3,17 +3,19 @@ import numpy as np
 
 
 def load_data(path="data/cora/", dataset="cora"):
-    """Load citation network dataset (cora only for now)"""
-    print('Loading {} dataset...'.format(dataset))
+    """Load citation network dataset"""
+    print('Loading {dataset} dataset...'.format(dataset=dataset))
 
-    idx_features_labels = np.genfromtxt("{}{}.content".format(path, dataset), dtype=np.dtype(str))
+    idx_features_labels = np.genfromtxt("{path}{dataset}.content"
+    .format(path=path, dataset=dataset), dtype=np.dtype(str))
     features = sp.csr_matrix(idx_features_labels[:, 1:-1], dtype=np.float32)
     labels = encode_onehot(idx_features_labels[:, -1])
 
     # build graph
     idx = np.array(idx_features_labels[:, 0], dtype=np.int32)
     idx_map = {j: i for i, j in enumerate(idx)}
-    edges_unordered = np.genfromtxt("{}{}.cites".format(path, dataset), dtype=np.int32)
+    edges_unordered = np.genfromtxt("{path}{dataset}.cites"
+                                    .format(path=path, dataset=dataset), dtype=np.int32)
     edges = np.array(list(map(idx_map.get, edges_unordered.flatten())),
                      dtype=np.int32).reshape(edges_unordered.shape)
     adj = sp.coo_matrix((np.ones(edges.shape[0]), (edges[:, 0], edges[:, 1])),
@@ -40,15 +42,18 @@ def load_data(path="data/cora/", dataset="cora"):
     y_val[val_mask] = labels[val_mask]
     y_test[test_mask] = labels[test_mask]
 
-    print('Dataset has {} nodes, {} edges, {} features.'.format(adj.shape[0], edges.shape[0], features.shape[1]))
+    print('Dataset has {node_quantity} nodes, {edge_quantity} edges, {feature_quantity} features.'
+        .format(node_quantity=adj.shape[0], edge_quantity=edges.shape[0], feature_quantity=features.shape[1]))
 
     return adj, features, y_train, y_val, y_test, train_mask, val_mask, test_mask
 
 
 def encode_onehot(labels):
     classes = set(labels)
-    classes_dict = {c: np.identity(len(classes))[i, :] for i, c in enumerate(classes)}
-    labels_onehot = np.array(list(map(classes_dict.get, labels)), dtype=np.int32)
+    classes_dict = {c: np.identity(len(classes))[i, :] 
+                    for i, c in enumerate(classes)}
+    labels_onehot = np.array(list(map(classes_dict.get, labels))
+                            , dtype=np.int32)
     return labels_onehot
 
 
@@ -66,5 +71,8 @@ def sample_mask(idx, l):   # mask操作
     """Create mask."""
     mask = np.zeros(l)
     mask[idx] = 1
-    return np.array(mask, dtype=np.bool)
+    return np.array(mask, dtype=np.bool_)
+
+if __name__ == "__main__":
+    load_data(path="data/cora/", dataset="cora")
 
