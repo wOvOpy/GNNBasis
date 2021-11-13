@@ -60,7 +60,7 @@ def encode_onehot(labels):
 def preprocess_features(features):    # 处理特征将特征进行归一化并返回tuple (coords, values, shape)  2708,1433
     """Row-normalize feature matrix and convert to tuple representation"""
     rowsum = np.array(features.sum(1))
-    r_inv = np.power(rowsum, -1).flatten()
+    r_inv = np.power(rowsum, -0.5).flatten()
     r_inv[np.isinf(r_inv)] = 0.
     r_mat_inv = sp.diags(r_inv)
     features = r_mat_inv.dot(features)
